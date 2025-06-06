@@ -1,11 +1,11 @@
 let scanCount = 0;
 let irisRecognized = false;
 let voiceRecorded = false;
-let audioBlob;
 let voiceRecordCount = 0;
+let audioBlob;
+let videoStream = null;
 
 const video = document.getElementById("video");
-const startIrisBtn = document.getElementById("startIrisBtn");
 const scanIrisBtn = document.getElementById("scanIrisBtn");
 const irisStatus = document.getElementById("irisStatus");
 const retryBtn = document.getElementById("retryBtn");
@@ -14,42 +14,33 @@ const voiceStatus = document.getElementById("voiceStatus");
 const audioPlayer = document.getElementById("audioPlayer");
 const submitBtn = document.getElementById("submitBtn");
 
-let videoStream = null;
-let audioStream = null;
+// Запускаємо камеру одразу, щоб було відео для сканування райдужки
+navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    videoStream = stream;
+    video.srcObject = stream;
+}).catch(err => {
+    irisStatus.textContent = "Помилка доступу до камери: " + err.message;
+});
 
-// Починаємо сканування райдужки — вмикаємо камеру і показуємо кнопку "Сканувати"
-startIrisBtn.onclick = async function () {
-    try {
-        videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = videoStream;
-        irisStatus.textContent = "";
-        startIrisBtn.style.display = "none";
-        scanIrisBtn.style.display = "inline-block";
-        recordBtn.style.display = "none";
-        voiceStatus.textContent = "";
-        audioPlayer.style.display = "none";
-        submitBtn.style.display = "none";
-        scanCount = 0;
-        irisRecognized = false;
-        voiceRecorded = false;
-        voiceRecordCount = 0;
-    } catch (err) {
-        irisStatus.textContent = "Помилка при запуску камери: " + err.message;
-    }
-};
-
-// Кнопка "Сканувати райдужку"
+// Логіка сканування райдужки
 scanIrisBtn.onclick = function () {
     scanCount++;
 
     if (scanCount === 1) {
         irisStatus.textContent = "Дані об'єкта збережено.";
-        // Наступний крок — ще раз сканувати
+        // Зелені кружечки залишаються
+    } else if (scanCount === 2) {
+        irisStatus.textContent = "Дані об'єкта збережено.";
+        // Зелені кружечки залишаються
     } else {
         irisRecognized = true;
         irisStatus.textContent = "Райдужку розпізнано!";
         scanIrisBtn.style.display = "none";
-        // Завершуємо відеопотік
+
+        // Приховуємо зелені кружечки
+        document.querySelectorAll('.eye').forEach(el => el.style.display = 'none');
+
+        // Вимикаємо камеру
         if (videoStream) {
             videoStream.getTracks().forEach(track => track.stop());
         }
@@ -60,13 +51,13 @@ scanIrisBtn.onclick = function () {
     }
 };
 
-// Кнопка "Записати голос"
-recordBtn.onclick = async function () {
-    try {
-        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(audioStream);
-        const audioChunks = [];
+// Логіка запису голосу
+recordBtn.onclick = function () {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
 
+        const audioChunks = [];
         mediaRecorder.ondataavailable = event => {
             audioChunks.push(event.data);
         };
@@ -83,34 +74,26 @@ recordBtn.onclick = async function () {
                 voiceStatus.textContent = "Голос збережено.";
                 submitBtn.style.display = "none";
             } else {
-                voiceRecorded = true;
                 voiceStatus.textContent = "Голос підтверджено!";
+                voiceRecorded = true;
                 submitBtn.style.display = "inline-block";
             }
 
-            // Зупиняємо аудіо потік
-            if (audioStream) {
-                audioStream.getTracks().forEach(track => track.stop());
-            }
+            // Зупиняємо аудіо стрім
+            stream.getTracks().forEach(track => track.stop());
         };
 
-        mediaRecorder.start();
-
-        // Запис 2 секунди
         setTimeout(() => {
             mediaRecorder.stop();
-        }, 2000);
-
-    } catch (err) {
-        voiceStatus.textContent = "Помилка при записі голосу: " + err.message;
-    }
+        }, 2000); // 2 секунди запису
+    }).catch(err => {
+        voiceStatus.textContent = "Помилка доступу до мікрофона: " + err.message;
+    });
 };
 
-// Кнопка "Надіслати"
+// Логіка кнопки "Надіслати"
 submitBtn.onclick = function () {
     if (irisRecognized && voiceRecorded) {
         window.location.href = "success.html";
-    } else {
-        alert("Будь ласка, пройдіть автентифікацію повністю.");
     }
 };

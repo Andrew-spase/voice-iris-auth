@@ -8,25 +8,21 @@
 <body>
     <div class="container">
         <h1>Мультимодальна автентифікація</h1>
-        
-        <!-- Відео та накладка очей -->
-        <div class="video-wrapper">
-            <video id="video" autoplay playsinline></video>
-            <div class="iris-overlay">
-                <div class="eye left-eye"></div>
-                <div class="eye right-eye"></div>
-            </div>
+        <video id="video" autoplay playsinline></video>
+        <div class="iris-overlay">
+            <div class="eye left-eye"></div>
+            <div class="eye right-eye"></div>
         </div>
-
-        <!-- Кнопки і статус -->
-        <button id="startIrisBtn">Почати сканування райдужки</button>
-        <button id="scanIrisBtn" style="display:none;">Сканувати райдужку</button>
+        <button id="scanIrisBtn">Сканувати райдужку</button>
         <p id="irisStatus"></p>
+
         <button id="recordBtn" style="display:none;">Записати голос</button>
         <p id="voiceStatus"></p>
         <audio id="audioPlayer" controls style="display:none;"></audio>
+
         <button id="submitBtn" style="display:none;">Надіслати</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
