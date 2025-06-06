@@ -15,17 +15,19 @@ video {
     width: 100%;
     max-width: 400px;
     border-radius: 10px;
+    background: black;
 }
 
 .iris-overlay {
     position: relative;
     width: 100%;
-    height: 0;
-    padding-top: 75%;
-    margin-bottom: -75%;
-    top: -400px;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto 20px auto;
+    pointer-events: none; /* Щоб кружечки не заважали клікам */
 }
 
+/* Зелені кружечки будуть відносно відео (центровані приблизно по райдужці) */
 .eye {
     width: 60px;
     height: 60px;
@@ -35,14 +37,18 @@ video {
     animation: pulse 2s infinite;
 }
 
+/* Ліва райдужка - приблизно центр зліва */
 .left-eye {
-    left: 100px;
-    top: 40px;
+    left: 25%;
+    top: 45%;
+    transform: translate(-50%, -50%);
 }
 
+/* Права райдужка - приблизно центр справа */
 .right-eye {
-    right: 100px;
-    top: 40px;
+    left: 75%;
+    top: 45%;
+    transform: translate(-50%, -50%);
 }
 
 @keyframes pulse {
@@ -55,4 +61,10 @@ button {
     margin-top: 15px;
     padding: 10px 20px;
     font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: default;
 }

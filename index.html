@@ -8,11 +8,14 @@
 <body>
     <div class="container">
         <h1>Мультимодальна автентифікація</h1>
+
         <video id="video" autoplay playsinline></video>
+
         <div class="iris-overlay">
             <div class="eye left-eye"></div>
             <div class="eye right-eye"></div>
         </div>
+
         <button id="scanIrisBtn">Сканувати райдужку</button>
         <p id="irisStatus"></p>
 
@@ -21,6 +24,7 @@
         <audio id="audioPlayer" controls style="display:none;"></audio>
 
         <button id="submitBtn" style="display:none;">Надіслати</button>
+        <button id="resetBtn" style="display:none; margin-top:15px;">Скинути</button>
     </div>
 
     <script src="script.js"></script>

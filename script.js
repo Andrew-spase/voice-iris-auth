@@ -1,58 +1,101 @@
-let scanCount = 0;
-let irisRecognized = false;
-let voiceRecorded = false;
-let voiceRecordCount = 0;
-let audioBlob;
-let videoStream = null;
-
 const video = document.getElementById("video");
 const scanIrisBtn = document.getElementById("scanIrisBtn");
 const irisStatus = document.getElementById("irisStatus");
-const retryBtn = document.getElementById("retryBtn");
 const recordBtn = document.getElementById("recordBtn");
 const voiceStatus = document.getElementById("voiceStatus");
 const audioPlayer = document.getElementById("audioPlayer");
 const submitBtn = document.getElementById("submitBtn");
+const resetBtn = document.getElementById("resetBtn");
 
-// Запускаємо камеру одразу, щоб було відео для сканування райдужки
-navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-    videoStream = stream;
-    video.srcObject = stream;
-}).catch(err => {
-    irisStatus.textContent = "Помилка доступу до камери: " + err.message;
-});
+let scanCount = 0;
+let irisRecognized = false;
+let voiceRecordCount = 0;
+let voiceRecorded = false;
+let audioBlob = null;
+let videoStream = null;
 
-// Логіка сканування райдужки
+// Функція запуску камери
+async function startCamera() {
+    try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = videoStream;
+        irisStatus.textContent = "";
+    } catch (err) {
+        irisStatus.textContent = "Помилка доступу до камери: " + err.message;
+    }
+}
+
+// Функція зупинки камери
+function stopCamera() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        videoStream = null;
+    }
+}
+
+// Початковий запуск камери
+startCamera();
+
+// Обробник натискання кнопки "Сканувати райдужку"
 scanIrisBtn.onclick = function () {
     scanCount++;
 
-    if (scanCount === 1) {
+    if (scanCount <= 2) {
         irisStatus.textContent = "Дані об'єкта збережено.";
         // Зелені кружечки залишаються
-    } else if (scanCount === 2) {
-        irisStatus.textContent = "Дані об'єкта збережено.";
-        // Зелені кружечки залишаються
-    } else {
+    } else if (scanCount === 3) {
         irisRecognized = true;
         irisStatus.textContent = "Райдужку розпізнано!";
         scanIrisBtn.style.display = "none";
 
-        // Приховуємо зелені кружечки
+        // Ховаємо зелені кружечки
         document.querySelectorAll('.eye').forEach(el => el.style.display = 'none');
 
-        // Вимикаємо камеру
-        if (videoStream) {
-            videoStream.getTracks().forEach(track => track.stop());
-        }
-        video.srcObject = null;
+        // Зупиняємо камеру
+        stopCamera();
 
         // Показуємо кнопку запису голосу
         recordBtn.style.display = "inline-block";
+
+        // Кнопка скидання
+        resetBtn.style.display = "inline-block";
     }
 };
 
-// Логіка запису голосу
+// Обробник кнопки скидання
+resetBtn.onclick = function () {
+    // Скидаємо стани
+    scanCount = 0;
+    voiceRecordCount = 0;
+    irisRecognized = false;
+    voiceRecorded = false;
+    audioBlob = null;
+
+    // Показуємо/ховаємо кнопки
+    scanIrisBtn.style.display = "inline-block";
+    recordBtn.style.display = "none";
+    submitBtn.style.display = "none";
+    resetBtn.style.display = "none";
+
+    // Очищаємо статуси
+    irisStatus.textContent = "";
+    voiceStatus.textContent = "";
+    audioPlayer.style.display = "none";
+    audioPlayer.src = "";
+
+    // Показуємо зелені кружечки
+    document.querySelectorAll('.eye').forEach(el => el.style.display = 'block');
+
+    // Запускаємо камеру знову
+    startCamera();
+};
+
+// Обробник запису голосу
 recordBtn.onclick = function () {
+    recordBtn.disabled = true;
+    voiceStatus.textContent = "Запис голосу...";
+
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.start();
@@ -73,25 +116,27 @@ recordBtn.onclick = function () {
             if (voiceRecordCount === 1) {
                 voiceStatus.textContent = "Голос збережено.";
                 submitBtn.style.display = "none";
-            } else {
+            } else if (voiceRecordCount >= 2) {
                 voiceStatus.textContent = "Голос підтверджено!";
                 voiceRecorded = true;
                 submitBtn.style.display = "inline-block";
             }
 
-            // Зупиняємо аудіо стрім
+            // Вимикаємо мікрофон
             stream.getTracks().forEach(track => track.stop());
+            recordBtn.disabled = false;
         };
 
         setTimeout(() => {
             mediaRecorder.stop();
-        }, 2000); // 2 секунди запису
+        }, 2000); // запис 2 секунди
     }).catch(err => {
-        voiceStatus.textContent = "Помилка доступу до мікрофона: " + err.message;
+        voiceStatus.textContent = "Помилка доступу до мікрофону: " + err.message;
+        recordBtn.disabled = false;
     });
 };
 
-// Логіка кнопки "Надіслати"
+// Обробник кнопки "Надіслати"
 submitBtn.onclick = function () {
     if (irisRecognized && voiceRecorded) {
         window.location.href = "success.html";
