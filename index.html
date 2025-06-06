@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Мультимодальна автентифікація</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мультимодальна автентифікація</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="container">
     <h1>Мультимодальна автентифікація</h1>
-    <div id="iris-scan">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="overlay"></canvas>
-        <button id="scan-iris">Сканувати райдужку</button>
-        <p id="iris-status"></p>
-    </div>
+    <video id="video" autoplay></video>
+    <button onclick="scanIris()">Сканувати райдужку</button>
+    <p id="irisResult"></p>
 
-    <div id="voice-auth" style="display: none;">
-        <button id="start-record">Записати голос</button>
-        <button id="stop-record" disabled>Зупинити</button>
-        <audio id="audio-playback" controls></audio>
-        <p id="voice-status"></p>
-    </div>
+    <button id="recordBtn" onclick="startRecording()">Записати голос</button>
+    <button id="stopBtn" onclick="stopRecording()" disabled>Зупинити</button>
+    <p id="voiceResult"></p>
+    <audio id="audio" controls></audio>
 
-    <script src="script.js"></script>
+    <button id="submitBtn" onclick="submitAuthentication()" style="display:none;">Надіслати ініціалізацію</button>
+
+    <p id="finalResult" class="message"></p>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
