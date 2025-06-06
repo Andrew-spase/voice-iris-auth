@@ -1,120 +1,49 @@
-const video = document.getElementById("video");
-const scanIrisBtn = document.getElementById("scanIrisBtn");
-const irisStatus = document.getElementById("irisStatus");
-const recordBtn = document.getElementById("recordBtn");
-const voiceStatus = document.getElementById("voiceStatus");
-const audioPlayer = document.getElementById("audioPlayer");
-const submitBtn = document.getElementById("submitBtn");
-const resetBtn = document.getElementById("resetBtn");
+let video = document.getElementById("video");
+let faceStatus = document.getElementById("face-status");
+let recordBtn = document.getElementById("record-btn");
+let voiceStatus = document.getElementById("voice-status");
+let attempts = 0;
+let faceRecognized = false;
+let voiceRecognized = false;
 
-let scanCount = 0;
-let irisRecognized = false;
-let voiceRecordCount = 0;
-let voiceRecorded = false;
-let audioBlob = null;
-let videoStream = null;
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        video.srcObject = stream;
+        simulateFaceRecognition();
+    });
 
-async function startCamera() {
-    try {
-        videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = videoStream;
-        irisStatus.textContent = "";
-    } catch (err) {
-        irisStatus.textContent = "Помилка доступу до камери: " + err.message;
-    }
-}
-
-function stopCamera() {
-    if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-        videoStream = null;
-    }
-}
-
-startCamera();
-
-scanIrisBtn.onclick = function () {
-    scanCount++;
-
-    if (scanCount < 3) {
-        irisStatus.textContent = "Дані райдужки збережено (" + scanCount + "/3). Продовжуйте.";
-    } else {
-        irisRecognized = true;
-        irisStatus.textContent = "Райдужку розпізнано!";
-        scanIrisBtn.style.display = "none";
-
-        stopCamera();
-
+function simulateFaceRecognition() {
+    setTimeout(() => {
+        faceStatus.textContent = "Обличчя розпізнано!";
+        faceRecognized = true;
         recordBtn.style.display = "inline-block";
-        resetBtn.style.display = "inline-block";
-    }
-};
-
-resetBtn.onclick = function () {
-    scanCount = 0;
-    voiceRecordCount = 0;
-    irisRecognized = false;
-    voiceRecorded = false;
-    audioBlob = null;
-
-    scanIrisBtn.style.display = "inline-block";
-    recordBtn.style.display = "none";
-    submitBtn.style.display = "none";
-    resetBtn.style.display = "none";
-
-    irisStatus.textContent = "";
-    voiceStatus.textContent = "";
-    audioPlayer.style.display = "none";
-    audioPlayer.src = "";
-
-    startCamera();
-};
+    }, 3000);
+}
 
 recordBtn.onclick = function () {
-    recordBtn.disabled = true;
-    voiceStatus.textContent = "Запис голосу...";
-
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        const mediaRecorder = new MediaRecorder(stream);
-        const audioChunks = [];
-
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-        mediaRecorder.onstop = () => {
-            audioBlob = new Blob(audioChunks);
-            const audioUrl = URL.createObjectURL(audioBlob);
-            audioPlayer.src = audioUrl;
-            audioPlayer.style.display = "block";
-
-            voiceRecordCount++;
-
-            if (voiceRecordCount === 1) {
-                voiceStatus.textContent = "Голос збережено. Запишіть ще раз для підтвердження.";
-                submitBtn.style.display = "none";
-            } else {
-                voiceRecorded = true;
-                voiceStatus.textContent = "Голос підтверджено!";
-                submitBtn.style.display = "inline-block";
-            }
-
-            stream.getTracks().forEach(track => track.stop());
-            recordBtn.disabled = false;
-        };
-
-        mediaRecorder.start();
-
-        setTimeout(() => {
-            mediaRecorder.stop();
-        }, 2000);
-    }).catch(err => {
-        voiceStatus.textContent = "Помилка доступу до мікрофону: " + err.message;
-        recordBtn.disabled = false;
-    });
+    simulateVoiceRecognition();
 };
 
-submitBtn.onclick = function () {
-    if (irisRecognized && voiceRecorded) {
+function simulateVoiceRecognition() {
+    voiceStatus.textContent = "Розпізнавання голосу...";
+    setTimeout(() => {
+        voiceRecognized = true;
+        voiceStatus.textContent = "Голос розпізнано!";
+        sendToGoogleSheets();
         window.location.href = "success.html";
-    }
-};
+    }, 3000);
+}
+
+function sendToGoogleSheets() {
+    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            status: "Успішна автентифікація"
+        })
+    });
+}
