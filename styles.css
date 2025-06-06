@@ -1,47 +1,58 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #e0eafc, #cfdef3);
+    background: linear-gradient(to right, #e0f7fa, #f0f4c3);
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .container {
+    padding: 20px;
     text-align: center;
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  }
-  
-  button {
-    margin: 10px;
-    padding: 10px 18px;
-    font-size: 16px;
-    border: none;
-    background-color: #0077cc;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  
-  video {
-    width: 300px;
-    height: 220px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+video {
+    width: 100%;
+    max-width: 400px;
     border-radius: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .message {
-    font-weight: bold;
-    font-size: 18px;
-    margin-top: 20px;
-  }
+}
+
+.iris-overlay {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 75%;
+    margin-bottom: -75%;
+    top: -400px;
+}
+
+.eye {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #00ff00;
+    border-radius: 50%;
+    position: absolute;
+    animation: pulse 2s infinite;
+}
+
+.left-eye {
+    left: 100px;
+    top: 40px;
+}
+
+.right-eye {
+    right: 100px;
+    top: 40px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+}

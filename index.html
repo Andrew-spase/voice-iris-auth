@@ -1,28 +1,55 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Мультимодальна автентифікація</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Доступ надано</title>
+    <style>
+        body {
+            background-color: #e8f5e9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 100px;
+            font-size: 24px;
+        }
+        .success {
+            background-color: #c8e6c9;
+            display: inline-block;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #388e3c;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Мультимодальна автентифікація</h1>
-    <video id="video" autoplay></video>
-    <button onclick="scanIris()">Сканувати райдужку</button>
-    <p id="irisResult"></p>
-
-    <button id="recordBtn" onclick="startRecording()">Записати голос</button>
-    <button id="stopBtn" onclick="stopRecording()" disabled>Зупинити</button>
-    <p id="voiceResult"></p>
-    <audio id="audio" controls></audio>
-
-    <button id="submitBtn" onclick="submitAuthentication()" style="display:none;">Надіслати ініціалізацію</button>
-
-    <p id="finalResult" class="message"></p>
-  </div>
-
-  <script src="script.js"></script>
+    <div class="success">
+        <p>Автентифікація пройдена</p>
+        <p>Доступ надано</p>
+    </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Мультимодальна автентифікація</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Мультимодальна автентифікація</h1>
+        <video id="video" autoplay playsinline></video>
+        <div class="iris-overlay">
+            <div class="eye left-eye"></div>
+            <div class="eye right-eye"></div>
+        </div>
+        <button id="scanIrisBtn">Сканувати райдужку</button>
+        <p id="irisStatus"></p>
+        <button id="retryBtn" style="display:none;">Спробувати ще раз</button>
+        <p id="voiceStatus"></p>
+        <button id="recordBtn">Записати голос</button>
+        <audio id="audioPlayer" controls style="display:none;"></audio>
+        <button id="submitBtn" style="display:none;">Надіслати</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>

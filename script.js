@@ -1,63 +1,69 @@
-let irisScanned = false;
+let scanCount = 0;
+let irisRecognized = false;
 let voiceRecorded = false;
-let accessGranted = false;
+let audioBlob;
+let voiceRecordCount = 0;
 
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then(stream => {
-    document.getElementById('video').srcObject = stream;
-  });
+document.getElementById("scanIrisBtn").onclick = function () {
+    const irisStatus = document.getElementById("irisStatus");
+    const retryBtn = document.getElementById("retryBtn");
+    scanCount++;
 
-function scanIris() {
-  irisScanned = true;
-  document.getElementById('irisResult').innerText = "Райдужку розпізнано!";
-  checkReady();
-}
+    if (scanCount === 1) {
+        irisStatus.textContent = "Дані об'єкта збережено.";
+        retryBtn.style.display = "inline-block";
+    } else {
+        irisRecognized = true;
+        irisStatus.textContent = "Райдужку розпізнано!";
+        retryBtn.style.display = "none";
+    }
+};
 
-let recorder, audioChunks = [];
+document.getElementById("retryBtn").onclick = function () {
+    document.getElementById("irisStatus").textContent = "";
+    this.style.display = "none";
+};
 
-function startRecording() {
-  audioChunks = [];
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-    recorder = new MediaRecorder(stream);
-    recorder.start();
-    recorder.ondataavailable = e => audioChunks.push(e.data);
-    recorder.onstop = () => {
-      const audioBlob = new Blob(audioChunks);
-      const audioUrl = URL.createObjectURL(audioBlob);
-      document.getElementById('audio').src = audioUrl;
-      document.getElementById('voiceResult').innerText = "Голос записано!";
-      voiceRecorded = true;
-      checkReady();
-    };
-  });
+document.getElementById("recordBtn").onclick = function () {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
 
-  document.getElementById('recordBtn').disabled = true;
-  document.getElementById('stopBtn').disabled = false;
-}
+        const audioChunks = [];
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
 
-function stopRecording() {
-  recorder.stop();
-  document.getElementById('stopBtn').disabled = true;
-}
+        mediaRecorder.onstop = () => {
+            audioBlob = new Blob(audioChunks);
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = document.getElementById("audioPlayer");
+            audio.src = audioUrl;
+            audio.style.display = "block";
 
-function checkReady() {
-  if (irisScanned && voiceRecorded) {
-    document.getElementById('submitBtn').style.display = 'inline-block';
-  }
-}
+            voiceRecordCount++;
 
-function submitAuthentication() {
-  const messageEl = document.getElementById('finalResult');
+            if (voiceRecordCount === 1) {
+                document.getElementById("voiceStatus").textContent = "Голос збережено.";
+                document.getElementById("submitBtn").style.display = "none";
+            } else {
+                document.getElementById("voiceStatus").textContent = "Голос підтверджено!";
+                voiceRecorded = true;
+                // Якщо райдужка теж розпізнана - показати кнопку
+                if (irisRecognized) {
+                    document.getElementById("submitBtn").style.display = "inline-block";
+                }
+            }
+        };
 
-  if (!accessGranted) {
-    messageEl.innerText = "Об'єкт не розпізнано!";
-    messageEl.style.color = "red";
-    accessGranted = true;
-  } else {
-    messageEl.innerText = "Об'єкт розпізнано! Переадресація...";
-    messageEl.style.color = "green";
-    setTimeout(() => {
-      window.location.href = "authenticated.html"; // 👉 створиш цю сторінку для "успішного входу"
-    }, 2000);
-  }
-}
+        setTimeout(() => {
+            mediaRecorder.stop();
+        }, 2000); // Запис 2 секунди
+    });
+};
+
+document.getElementById("submitBtn").onclick = function () {
+    if (irisRecognized && voiceRecorded) {
+        window.location.href = "success.html";
+    }
+};
