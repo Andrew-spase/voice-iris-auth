@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Автентифікація за обличчям</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <title>Мультимодальна автентифікація</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <div class="container">
-        <h1>Автентифікація за обличчям</h1>
-        <video id="video" autoplay muted></video>
-        <p id="faceStatus">Очікування розпізнавання обличчя...</p>
-        <button id="startAuthBtn">Розпочати авторизацію</button>
-        <audio id="successSound" src="success.mp3"></audio>
+        <h1>Мультимодальна автентифікація</h1>
+
+        <video id="video" autoplay playsinline></video>
+
+        <button id="scanIrisBtn">Сканувати райдужку</button>
+        <p id="irisStatus"></p>
+
+        <button id="recordBtn" style="display:none;">Записати голос</button>
+        <p id="voiceStatus"></p>
+        <audio id="audioPlayer" controls style="display:none;"></audio>
+
+        <button id="submitBtn" style="display:none;">Надіслати</button>
+        <button id="resetBtn" style="display:none; margin-top:15px;">Скинути</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
