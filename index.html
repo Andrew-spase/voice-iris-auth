@@ -1,52 +1,29 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Доступ надано</title>
-    <style>
-        body {
-            background-color: #e8f5e9;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 100px;
-            font-size: 24px;
-        }
-        .success {
-            background-color: #c8e6c9;
-            display: inline-block;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #388e3c;
-        }
-    </style>
-</head>
-<body>
-    <div class="success">
-        <p>Автентифікація пройдена</p>
-        <p>Доступ надано</p>
-    </div>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Мультимодальна автентифікація</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <div class="container">
         <h1>Мультимодальна автентифікація</h1>
-        <video id="video" autoplay playsinline></video>
-        <div class="iris-overlay">
-            <div class="eye left-eye"></div>
-            <div class="eye right-eye"></div>
+        
+        <!-- Відео та накладка очей -->
+        <div class="video-wrapper">
+            <video id="video" autoplay playsinline></video>
+            <div class="iris-overlay">
+                <div class="eye left-eye"></div>
+                <div class="eye right-eye"></div>
+            </div>
         </div>
-        <button id="scanIrisBtn">Сканувати райдужку</button>
+
+        <!-- Кнопки і статус -->
+        <button id="startIrisBtn">Почати сканування райдужки</button>
+        <button id="scanIrisBtn" style="display:none;">Сканувати райдужку</button>
         <p id="irisStatus"></p>
-        <button id="retryBtn" style="display:none;">Спробувати ще раз</button>
+        <button id="recordBtn" style="display:none;">Записати голос</button>
         <p id="voiceStatus"></p>
-        <button id="recordBtn">Записати голос</button>
         <audio id="audioPlayer" controls style="display:none;"></audio>
         <button id="submitBtn" style="display:none;">Надіслати</button>
     </div>
