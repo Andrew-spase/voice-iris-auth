@@ -2,26 +2,49 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8" />
-    <title>Мультимодальна автентифікація</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Система військової ідентифікації</title>
+    <script defer src="https://unpkg.com/face-api.js"></script>
+    <script defer src="script.js"></script>
+    <style>
+        body {
+            background-color: #1c1f1b;
+            font-family: 'Courier New', monospace;
+            color: #d0f0c0;
+            text-align: center;
+            padding-top: 30px;
+        }
+        video {
+            border: 2px solid #0f0;
+            border-radius: 10px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #audioPlayer {
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Мультимодальна автентифікація</h1>
-
-        <video id="video" autoplay playsinline></video>
-
-        <button id="scanIrisBtn">Сканувати райдужку</button>
+    <h1>Система ідентифікації особового складу</h1>
+    <video id="video" width="400" height="300" autoplay muted></video>
+    <div>
         <p id="irisStatus"></p>
-
-        <button id="recordBtn" style="display:none;">Записати голос</button>
+        <button id="scanIrisBtn">Розпізнати обличчя</button>
+        <br />
         <p id="voiceStatus"></p>
-        <audio id="audioPlayer" controls style="display:none;"></audio>
-
-        <button id="submitBtn" style="display:none;">Надіслати</button>
-        <button id="resetBtn" style="display:none; margin-top:15px;">Скинути</button>
+        <button id="recordBtn" style="display: none;">Записати голосовий код</button>
+        <audio id="audioPlayer" controls></audio>
+        <br />
+        <button id="submitBtn" style="display: none;">Підтвердити особу</button>
+        <button id="resetBtn" style="display: none;">Скинути</button>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>

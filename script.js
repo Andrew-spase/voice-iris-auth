@@ -1,14 +1,20 @@
+// Завантаження моделей face-api.js
+Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+]).then(startCamera);
+
 const video = document.getElementById("video");
-const scanIrisBtn = document.getElementById("scanIrisBtn");
-const irisStatus = document.getElementById("irisStatus");
+const scanFaceBtn = document.getElementById("scanIrisBtn");
+const faceStatus = document.getElementById("irisStatus");
 const recordBtn = document.getElementById("recordBtn");
 const voiceStatus = document.getElementById("voiceStatus");
 const audioPlayer = document.getElementById("audioPlayer");
 const submitBtn = document.getElementById("submitBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-let scanCount = 0;
-let irisRecognized = false;
+let faceRecognized = false;
 let voiceRecordCount = 0;
 let voiceRecorded = false;
 let audioBlob = null;
@@ -18,9 +24,9 @@ async function startCamera() {
     try {
         videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = videoStream;
-        irisStatus.textContent = "";
+        faceStatus.textContent = "";
     } catch (err) {
-        irisStatus.textContent = "Помилка доступу до камери: " + err.message;
+        faceStatus.textContent = "Помилка доступу до камери: " + err.message;
     }
 }
 
@@ -32,38 +38,37 @@ function stopCamera() {
     }
 }
 
-startCamera();
+scanFaceBtn.onclick = async function () {
+    faceStatus.textContent = "Сканування обличчя військовослужбовця. Будь ласка, дивіться прямо в камеру.";
 
-scanIrisBtn.onclick = function () {
-    scanCount++;
+    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
 
-    if (scanCount < 3) {
-        irisStatus.textContent = "Дані райдужки збережено (" + scanCount + "/3). Продовжуйте.";
-    } else {
-        irisRecognized = true;
-        irisStatus.textContent = "Райдужку розпізнано!";
-        scanIrisBtn.style.display = "none";
+    if (detection) {
+        faceRecognized = true;
+        faceStatus.textContent = "Ідентифікація завершена. Обличчя розпізнано.";
+        scanFaceBtn.style.display = "none";
 
         stopCamera();
 
         recordBtn.style.display = "inline-block";
         resetBtn.style.display = "inline-block";
+    } else {
+        faceStatus.textContent = "Обличчя не розпізнано. Спробуйте ще раз.";
     }
 };
 
 resetBtn.onclick = function () {
-    scanCount = 0;
+    faceRecognized = false;
     voiceRecordCount = 0;
-    irisRecognized = false;
     voiceRecorded = false;
     audioBlob = null;
 
-    scanIrisBtn.style.display = "inline-block";
+    scanFaceBtn.style.display = "inline-block";
     recordBtn.style.display = "none";
     submitBtn.style.display = "none";
     resetBtn.style.display = "none";
 
-    irisStatus.textContent = "";
+    faceStatus.textContent = "";
     voiceStatus.textContent = "";
     audioPlayer.style.display = "none";
     audioPlayer.src = "";
@@ -73,7 +78,7 @@ resetBtn.onclick = function () {
 
 recordBtn.onclick = function () {
     recordBtn.disabled = true;
-    voiceStatus.textContent = "Запис голосу...";
+    voiceStatus.textContent = "Йде запис голосового підтвердження...";
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const mediaRecorder = new MediaRecorder(stream);
@@ -90,11 +95,11 @@ recordBtn.onclick = function () {
             voiceRecordCount++;
 
             if (voiceRecordCount === 1) {
-                voiceStatus.textContent = "Голос збережено. Запишіть ще раз для підтвердження.";
+                voiceStatus.textContent = "Зразок збережено. Повторіть голосовий код для верифікації.";
                 submitBtn.style.display = "none";
             } else {
                 voiceRecorded = true;
-                voiceStatus.textContent = "Голос підтверджено!";
+                voiceStatus.textContent = "Голосовий код підтверджено. Доступ дозволено.";
                 submitBtn.style.display = "inline-block";
             }
 
@@ -114,7 +119,22 @@ recordBtn.onclick = function () {
 };
 
 submitBtn.onclick = function () {
-    if (irisRecognized && voiceRecorded) {
-        window.location.href = "success.html";
+    if (faceRecognized && voiceRecorded) {
+        const formData = new FormData();
+        formData.append("faceRecognized", faceRecognized);
+        formData.append("voiceBlob", audioBlob);
+
+        fetch("https://your-military-server.example.com/auth", {
+            method: "POST",
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = "success.html";
+            } else {
+                alert("Помилка верифікації на сервері.");
+            }
+        }).catch(err => {
+            alert("З'єднання з сервером неможливе: " + err.message);
+        });
     }
 };
