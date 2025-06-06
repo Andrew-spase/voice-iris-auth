@@ -7,11 +7,11 @@
 </head>
 <body>
     <div class="container">
-        <h2>Автентифікація за допомогою обличчя та голосу</h2>
-        <video id="video" autoplay muted playsinline></video>
-        <p id="face-status">Сканування обличчя...</p>
-        <button id="record-btn" style="display:none;">Розпочати розпізнавання голосу</button>
-        <p id="voice-status"></p>
+        <h1>Автентифікація за обличчям</h1>
+        <video id="video" autoplay muted></video>
+        <p id="faceStatus">Очікування розпізнавання обличчя...</p>
+        <button id="startAuthBtn">Розпочати авторизацію</button>
+        <audio id="successSound" src="success.mp3"></audio>
     </div>
     <script src="script.js"></script>
 </body>

@@ -1,49 +1,35 @@
+let startAuthBtn = document.getElementById("startAuthBtn");
+let faceStatus = document.getElementById("faceStatus");
 let video = document.getElementById("video");
-let faceStatus = document.getElementById("face-status");
-let recordBtn = document.getElementById("record-btn");
-let voiceStatus = document.getElementById("voice-status");
-let attempts = 0;
-let faceRecognized = false;
-let voiceRecognized = false;
+let successSound = document.getElementById("successSound");
+let stream;
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
+startAuthBtn.onclick = async () => {
+    faceStatus.textContent = "Зберігання даних обличчя...";
+    startAuthBtn.disabled = true;
+
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         video.srcObject = stream;
-        simulateFaceRecognition();
-    });
 
-function simulateFaceRecognition() {
-    setTimeout(() => {
-        faceStatus.textContent = "Обличчя розпізнано!";
-        faceRecognized = true;
-        recordBtn.style.display = "inline-block";
-    }, 3000);
-}
+        setTimeout(() => {
+            faceStatus.textContent = "Авторизація користувача...";
+        }, 3000);
 
-recordBtn.onclick = function () {
-    simulateVoiceRecognition();
+        setTimeout(() => {
+            successSound.play();
+            faceStatus.textContent = "Користувача авторизовано!";
+            stopStream();
+        }, 6000);
+    } catch (err) {
+        faceStatus.textContent = "Не вдалося отримати доступ до камери.";
+        startAuthBtn.disabled = false;
+    }
 };
 
-function simulateVoiceRecognition() {
-    voiceStatus.textContent = "Розпізнавання голосу...";
-    setTimeout(() => {
-        voiceRecognized = true;
-        voiceStatus.textContent = "Голос розпізнано!";
-        sendToGoogleSheets();
-        window.location.href = "success.html";
-    }, 3000);
-}
-
-function sendToGoogleSheets() {
-    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            status: "Успішна автентифікація"
-        })
-    });
+function stopStream() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
 }
