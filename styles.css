@@ -18,45 +18,6 @@ video {
     background: black;
 }
 
-.iris-overlay {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    height: 300px;
-    margin: 0 auto 20px auto;
-    pointer-events: none; /* Щоб кружечки не заважали клікам */
-}
-
-/* Зелені кружечки будуть відносно відео (центровані приблизно по райдужці) */
-.eye {
-    width: 60px;
-    height: 60px;
-    border: 3px solid #00ff00;
-    border-radius: 50%;
-    position: absolute;
-    animation: pulse 2s infinite;
-}
-
-/* Ліва райдужка - приблизно центр зліва */
-.left-eye {
-    left: 25%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-}
-
-/* Права райдужка - приблизно центр справа */
-.right-eye {
-    left: 75%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.7; }
-}
-
 button {
     margin-top: 15px;
     padding: 10px 20px;
